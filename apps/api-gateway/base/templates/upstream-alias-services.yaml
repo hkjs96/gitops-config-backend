@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.upstreams.userService.name }}
+spec:
+  type: ExternalName
+  externalName: "{{ .Values.upstreams.userService.name }}.{{ .Values.upstreams.userService.namespace }}.svc.cluster.local"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.upstreams.orderService.name }}
+spec:
+  type: ExternalName
+  externalName: "{{ .Values.upstreams.orderService.name }}.{{ .Values.upstreams.orderService.namespace }}.svc.cluster.local"

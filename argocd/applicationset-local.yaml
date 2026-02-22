@@ -1,0 +1,43 @@
+# ──────────────────────────────────────────────────────────
+# 로컬(k3d) 전용 ApplicationSet — 같은 클러스터에서 dev/stg 동시 테스트
+# dev: Auto Sync + prune + selfHeal
+# stg: Manual Sync
+# ──────────────────────────────────────────────────────────
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: msa-apps-local
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - serviceName: user-service
+                - serviceName: order-service
+                - serviceName: api-gateway
+          - list:
+              elements:
+                - env: dev
+                - env: stg
+  template:
+    metadata:
+      name: "{{ .serviceName }}-{{ .env }}"
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/hkjs96/gitops-config-backend.git
+        targetRevision: HEAD
+        path: "apps/{{ .serviceName }}/base"
+        helm:
+          valueFiles:
+            - "../overlays/{{ .env }}/values.yaml"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ .serviceName }}-{{ .env }}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true

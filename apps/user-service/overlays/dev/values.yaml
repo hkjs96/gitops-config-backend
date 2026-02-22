@@ -1,0 +1,4 @@
+app:
+  profile: dev
+image:
+  tag: "dev-1"

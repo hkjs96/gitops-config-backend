@@ -1,0 +1,35 @@
+replicaCount: 1
+
+app:
+  profile: dev
+
+image:
+  repository: api-gateway
+  tag: "dev-1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+service:
+  name: api-gateway
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+  host: ""
+  groupName: ""
+
+upstreams:
+  userService:
+    name: user-service
+    namespace: user-service-dev
+  orderService:
+    name: order-service
+    namespace: order-service-dev

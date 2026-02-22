@@ -1,0 +1,5 @@
+app:
+  profile: prd
+image:
+  tag: "prd-1"
+replicaCount: 2

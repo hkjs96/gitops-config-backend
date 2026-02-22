@@ -1,0 +1,74 @@
+# ──────────────────────────────────────────────────────────
+# DEV 환경 — Auto Sync + prune + selfHeal
+# ──────────────────────────────────────────────────────────
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: user-service-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hkjs96/gitops-config-backend.git
+    targetRevision: HEAD
+    path: apps/user-service/base
+    helm:
+      valueFiles:
+        - ../overlays/dev/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: user-service-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: order-service-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hkjs96/gitops-config-backend.git
+    targetRevision: HEAD
+    path: apps/order-service/base
+    helm:
+      valueFiles:
+        - ../overlays/dev/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: order-service-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-gateway-dev
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hkjs96/gitops-config-backend.git
+    targetRevision: HEAD
+    path: apps/api-gateway/base
+    helm:
+      valueFiles:
+        - ../overlays/dev/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: api-gateway-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

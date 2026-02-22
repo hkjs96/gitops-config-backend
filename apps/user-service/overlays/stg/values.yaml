@@ -1,0 +1,5 @@
+app:
+  profile: stg
+image:
+  tag: "stg-1"
+replicaCount: 1

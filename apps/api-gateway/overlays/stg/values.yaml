@@ -1,0 +1,12 @@
+app:
+  profile: stg
+image:
+  tag: "stg-1"
+ingress:
+  enabled: true
+  groupName: stg-gateway
+upstreams:
+  userService:
+    namespace: user-service-stg
+  orderService:
+    namespace: order-service-stg

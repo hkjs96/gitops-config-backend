@@ -1,0 +1,65 @@
+# ──────────────────────────────────────────────────────────
+# STG 환경 — Manual Sync (automated 블록 없음)
+# ──────────────────────────────────────────────────────────
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: user-service-stg
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hkjs96/gitops-config-backend.git
+    targetRevision: HEAD
+    path: apps/user-service/base
+    helm:
+      valueFiles:
+        - ../overlays/stg/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: user-service-stg
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: order-service-stg
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hkjs96/gitops-config-backend.git
+    targetRevision: HEAD
+    path: apps/order-service/base
+    helm:
+      valueFiles:
+        - ../overlays/stg/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: order-service-stg
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-gateway-stg
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/hkjs96/gitops-config-backend.git
+    targetRevision: HEAD
+    path: apps/api-gateway/base
+    helm:
+      valueFiles:
+        - ../overlays/stg/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: api-gateway-stg
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

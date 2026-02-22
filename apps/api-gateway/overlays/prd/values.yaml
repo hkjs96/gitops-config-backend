@@ -1,0 +1,13 @@
+app:
+  profile: prd
+image:
+  tag: "prd-1"
+replicaCount: 2
+ingress:
+  enabled: true
+  groupName: prd-gateway
+upstreams:
+  userService:
+    namespace: user-service-prd
+  orderService:
+    namespace: order-service-prd

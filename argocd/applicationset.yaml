@@ -1,0 +1,87 @@
+# ──────────────────────────────────────────────────────────
+# 멀티클러스터(EKS) 전용 ApplicationSet — 3서비스 x 3환경 = 9 App
+# dev: Auto Sync + prune + selfHeal
+# stg/prd: Manual Sync
+#
+# ApplicationSet template 안에서 조건부 syncPolicy를 쓸 수 없으므로
+# dev / stg+prd를 별도 ApplicationSet으로 분리
+# ──────────────────────────────────────────────────────────
+
+# ── DEV (Auto Sync) ──
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: msa-apps-dev
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - list:
+        elements:
+          - serviceName: user-service
+          - serviceName: order-service
+          - serviceName: api-gateway
+  template:
+    metadata:
+      name: "{{ .serviceName }}-dev"
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/hkjs96/gitops-config-backend.git
+        targetRevision: HEAD
+        path: "apps/{{ .serviceName }}/base"
+        helm:
+          valueFiles:
+            - "../overlays/dev/values.yaml"
+      destination:
+        server: <DEV_CLUSTER_URL>
+        namespace: "{{ .serviceName }}-dev"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+---
+# ── STG + PRD (Manual Sync) ──
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: msa-apps-stg-prd
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - matrix:
+        generators:
+          - list:
+              elements:
+                - serviceName: user-service
+                - serviceName: order-service
+                - serviceName: api-gateway
+          - list:
+              elements:
+                - env: stg
+                  cluster: <STG_CLUSTER_URL>
+                - env: prd
+                  cluster: <PRD_CLUSTER_URL>
+  template:
+    metadata:
+      name: "{{ .serviceName }}-{{ .env }}"
+      namespace: argocd
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/hkjs96/gitops-config-backend.git
+        targetRevision: HEAD
+        path: "apps/{{ .serviceName }}/base"
+        helm:
+          valueFiles:
+            - "../overlays/{{ .env }}/values.yaml"
+      destination:
+        server: "{{ .cluster }}"
+        namespace: "{{ .serviceName }}-{{ .env }}"
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true

@@ -1,0 +1,22 @@
+replicaCount: 1
+
+app:
+  profile: dev
+
+image:
+  repository: user-service
+  tag: "dev-1"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+service:
+  name: user-service
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: false
+  className: alb
+  annotations: {}
+  host: ""
