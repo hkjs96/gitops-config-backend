@@ -1,4 +1,4 @@
 app:
   profile: dev
 image:
-  tag: "dev-1"
+  tag: "dev-2"
